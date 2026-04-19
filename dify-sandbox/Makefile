@@ -9,7 +9,7 @@ vet: fmt
 	go vet ./...
 
 build: vet
-	go build -o main ./cmd/syscall/main.go
+	go build -o main ./cmd/run/main.go
 
 clean:
 	go clean
