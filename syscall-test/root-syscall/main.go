@@ -12,6 +12,16 @@ import (
 func main() {
 	newRoot := "/var/sandbox/sandbox-python"
 
+	// nums := strings.Split("1,2,3", ",")
+	// for num := range nums {
+	// 	syscall, err := strconv.Atoi(nums[num])
+	// 	if err != nil {
+	// 		fmt.Printf("Atoi err:%v\n", err)
+	// 		continue
+	// 	}
+	// 	fmt.Println(syscall)
+	// }
+
 	if err := syscall.Chroot(newRoot); err != nil {
 		log.Fatalf("chroot失败: %v", err)
 	}

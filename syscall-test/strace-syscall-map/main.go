@@ -11,31 +11,37 @@ import (
 	"strings"
 )
 
+const (
+	SYSCALL_NUMS = 500
+)
+
 func main() {
-	// if len(os.Args) < 2 {
-	// 	fmt.Println("用法: go run main.go <python脚本>")
-	// 	fmt.Println("示例: go run main.go json_print.py")
-	// 	os.Exit(1)
-	// }
+
+	allSysCallList := make([]string, 0, SYSCALL_NUMS)
+	for sysCallNum := range SYSCALL_NUMS {
+		allSysCallList = append(allSysCallList, strconv.Itoa(sysCallNum))
+	}
+
 	sysCallMap, err := getSyscallSMap()
 	if err != nil {
 		fmt.Printf("get syscall error:%s\n", err.Error())
 		return
 	}
+	fmt.Printf("syscall map info %v\n", sysCallMap)
 
-	// 执行 strace 命令
-	cmd := exec.Command("strace", "-c", "python", "test.py", "/var/sandbox/sandbox-python", "3<json_print.py")
+	os.Setenv("ALLOWED_SYSCALLS", strings.Join(allSysCallList, ","))
+	// cmd := exec.Command("strace", "-c", "python", "prescript.py", "/var/sandbox/sandbox-python", "3<json_print.py")
+	cmd := exec.Command("strace", "-c", "python", "json_print.py")
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		fmt.Printf("执行 strace 失败: %v\n", err)
-		// 继续处理输出
+		fmt.Printf("exec strace err: %v\n output:%s\n", err, output)
+		return
 	}
+	outputStr := string(output)
+	fmt.Printf("exec strace output:%s\n\n", outputStr)
 
-	fmt.Printf("syscall map info %v\n", sysCallMap)
-
-	// 解析输出
-	parseStraceOutput(string(output), sysCallMap)
+	parseStraceOutput(outputStr, sysCallMap)
 }
 
 func getSyscallSMap() (map[string]string, error) {

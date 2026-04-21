@@ -22,14 +22,11 @@ running_path = sys.argv[1]
 if not running_path:
     exit(-1)
 
-python_path = sys.argv[2]
-if not running_path:
-    exit(-1)
-
 os.chdir(running_path)
 
 lib.DifySeccomp(10099, 0, 1)
 
-with open('script.py', 'r', encoding='utf-8') as f:
-    code = f.read()
-    exec(compile(code, 'script.py', 'exec'))
+with os.fdopen(3, "rb") as code_fd:
+    code = code_fd.read().decode("utf-8")
+
+exec(compile(code, "<fd3>", "exec"))
