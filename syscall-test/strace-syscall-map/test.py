@@ -22,14 +22,10 @@ running_path = sys.argv[1]
 if not running_path:
     exit(-1)
 
-python_path = sys.argv[2]
-if not running_path:
-    exit(-1)
-
 os.chdir(running_path)
 
-lib.DifySeccomp(10099, 0, 1)
+lib.DifySeccomp(10099, 1001, 1)
 
-with open('script.py', 'r', encoding='utf-8') as f:
+with open('json_print.py', 'r', encoding='utf-8') as f:
     code = f.read()
-    exec(compile(code, 'script.py', 'exec'))
+    exec(compile(code, 'json_print.py', 'exec'))

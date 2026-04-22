@@ -30,8 +30,8 @@ func main() {
 	fmt.Printf("syscall map info %v\n", sysCallMap)
 
 	os.Setenv("ALLOWED_SYSCALLS", strings.Join(allSysCallList, ","))
-	// cmd := exec.Command("strace", "-c", "python", "prescript.py", "/var/sandbox/sandbox-python", "3<json_print.py")
-	cmd := exec.Command("strace", "-c", "python", "json_print.py")
+	cmd := exec.Command("strace", "-c", "python", "test.py", "/var/sandbox/sandbox-python")
+	// cmd := exec.Command("strace", "-c", "python", "json_print.py")
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
