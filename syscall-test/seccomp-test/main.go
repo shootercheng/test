@@ -20,9 +20,9 @@ const (
 
 func main() {
 	allowedSysCall := []int{
-		0, 1, 3, 5, 8, 9, 10, 11, 12, 13, 16, 17, 21, 59, 72, 79, 89, 102, 104, 107, 108, 158, 186, 202, 217, 218, 257, 262, 273, 302, 318, 334,
+		0, 1, 3, 5, 8, 9, 10, 11, 12, 13, 16, 17, 21, 59, 72, 79, 89, 158, 186, 202, 217, 218, 257, 262, 273, 302, 318, 334,
 	}
-	err := seccomp(allowedSysCall, []int{})
+	err := seccomp(allowedSysCall[:3], []int{})
 	if err != nil {
 		fmt.Printf("seccomp error:%v\n", err)
 		return
@@ -38,7 +38,7 @@ func main() {
 }
 
 func seccomp(allowed_syscalls []int, allowed_not_kill_syscalls []int) error {
-	ctx, err := sg.NewFilter(sg.ActLog)
+	ctx, err := sg.NewFilter(sg.ActKillProcess)
 	if err != nil {
 		return err
 	}

@@ -60,3 +60,7 @@ Setgid============
 ------ ----------- ----------- --------- --------- ------------------
 100.00    0.006240           6       980        80 total
 ```
+
+# 运行 test.py 
+1.复制需要运行的文件 json_print.py  在 /var/sandbox/sandbox-python 
+2.在根目录执行 go run strace-syscall-map/main.go
