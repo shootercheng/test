@@ -40,6 +40,13 @@ type Data struct {
 	Stdout string `json:"stdout"`
 }
 
+var fileSuffixToLangMap = map[string]string{
+	"py": "python3",
+	"js": "nodejs",
+}
+
+var testFileDir = []string{"python", "nodejs"}
+
 func NewSandboxClient(requestHost string, apiKey string) *SandboxClient {
 	transport := &http.Transport{
 		MaxIdleConns:        100,
@@ -62,15 +69,7 @@ func NewSandboxClient(requestHost string, apiKey string) *SandboxClient {
 	}
 }
 
-func (c *SandboxClient) SendCode(code string) ([]byte, error) {
-	// Prepare request body
-	reqBody := RequestBody{
-		Language:      "python3",
-		Code:          code,
-		Preload:       "",
-		EnableNetwork: false,
-	}
-
+func (c *SandboxClient) SendCode(reqBody *RequestBody) ([]byte, error) {
 	jsonData, err := json.Marshal(reqBody)
 	if err != nil {
 		fmt.Printf("Error marshaling JSON: %v\n", err)
@@ -115,45 +114,66 @@ func InvokeSandBoxRun() {
 		return
 	}
 
-	pythonFilePath := "python"
-	entries, err := os.ReadDir(pythonFilePath)
-	if err != nil {
-		fmt.Println("Error reading directory:", err)
-		return
-	}
-
 	client := NewSandboxClient(requestHost, apiKey)
 	defer client.Close()
 
-	for _, entry := range entries {
-		codePath := pythonFilePath + "/" + entry.Name()
-		fmt.Printf("test python file:%s\n", codePath)
-		// Read code from file
-		codeContent, err := readCodeFromFile(codePath)
+	for _, filePath := range testFileDir {
+		entries, err := os.ReadDir(filePath)
 		if err != nil {
-			fmt.Println("Error reading code file:", err)
+			fmt.Println("Error reading directory:", err)
 			continue
 		}
-		resp := httpRequest(client, codeContent)
-		if resp.Data.Error != "" && strings.Contains(resp.Data.Error, "operation not permitted") {
-			fmt.Println("syscall error, please check")
+		for _, entry := range entries {
+			fileName := entry.Name()
+			codePath := filePath + "/" + fileName
+			fmt.Printf("test file path:%s\n", codePath)
+			// Read code from file
+			codeContent, err := readCodeFromFile(codePath)
+			if err != nil {
+				fmt.Printf("Error reading code file:%v\n", err)
+				continue
+			}
+			fileNameArr := strings.Split(fileName, ".")
+			var fileSuffix string
+			if len(fileNameArr) > 1 {
+				fileSuffix = fileNameArr[len(fileNameArr)-1]
+			}
+			language, ok := fileSuffixToLangMap[fileSuffix]
+			if !ok {
+				fmt.Printf("file name :%s error\n", fileName)
+				continue
+			}
+			reqBody := &RequestBody{
+				Language:      language,
+				Code:          codeContent,
+				Preload:       "",
+				EnableNetwork: true,
+			}
+			resp, err := httpRequest(client, reqBody)
+			if err != nil {
+				fmt.Printf("http request error:%v\n", err)
+				return
+			}
+			if resp.Data.Error != "" && strings.Contains(resp.Data.Error, "operation not permitted") {
+				fmt.Println("syscall error, please check")
+			}
 		}
 	}
 }
 
-func httpRequest(client *SandboxClient, code string) Response {
-	res, err := client.SendCode(code)
+func httpRequest(client *SandboxClient, reqBody *RequestBody) (*Response, error) {
+	res, err := client.SendCode(reqBody)
 	if err != nil {
-		fmt.Printf("request err:%s\n", err.Error())
+		return nil, err
 	}
 
 	var resp Response
 	err = json.Unmarshal(res, &resp)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	fmt.Printf("request result:%s\n", string(res))
-	return resp
+	return &resp, nil
 }
 
 func readCodeFromFile(filename string) (string, error) {

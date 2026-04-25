@@ -163,7 +163,7 @@ Linux scd-X99 6.17.0-22-generic #22~24.04.1-Ubuntu SMP PREEMPT_DYNAMIC Thu Mar 2
 参考我之前文章的分析 [https://blog.csdn.net/modelmd/article/details/160346298](https://blog.csdn.net/modelmd/article/details/160346298), 不同的操作系统可能原因不一样
 
 我的本地是由于`SYSCALL=epoll_pwait` 系统调用被限制了
-只需要在参数调用的时候改成 `"enable_network": false` 就可以允许`SYS_EPOLL_PWAIT = 281`  epoll_pwait 系统调用了
+只需要在参数调用的时候改成 `"enable_network": true` 就可以允许`SYS_EPOLL_PWAIT = 281`  epoll_pwait 系统调用了
 也可以直接修改源码，官方的源码不是很安全。修改参数 `"enable_network": true` 之后再次运行
 
 ```bash

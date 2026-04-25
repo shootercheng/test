@@ -19,7 +19,7 @@ curl -X POST ${REQUEST_HOST}/v1/sandbox/run \
     "language": "python3",
     "code": "import json\nperson = {\"name\": \"John\", \"age\": 30, \"city\": \"New York\"}\njson_str = json.dumps(person)\nprint(json_str)",
     "preload": "",
-    "enable_network": true
+    "enable_network": false
   }'
 
 echo ""
