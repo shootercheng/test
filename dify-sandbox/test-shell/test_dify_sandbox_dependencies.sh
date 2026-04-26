@@ -1,4 +1,9 @@
+#!/bin/bash
+set -eu
 
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+
+source ${SCRIPT_DIR}/test_env.sh
 
 echo "更新依赖 复制python_lib_path依赖:/v1/sandbox/dependencies/update"
 curl -X POST ${REQUEST_HOST}/v1/sandbox/dependencies/update \
