@@ -128,7 +128,7 @@ func InvokeSandBoxRun() {
 			codePath := filePath + "/" + fileName
 			fmt.Printf("test file path:%s\n", codePath)
 			// Read code from file
-			codeContent, err := readCodeFromFile(codePath)
+			codeContent, err := ReadCodeFromFile(codePath)
 			if err != nil {
 				fmt.Printf("Error reading code file:%v\n", err)
 				continue
@@ -152,7 +152,7 @@ func InvokeSandBoxRun() {
 			resp, err := httpRequest(client, reqBody)
 			if err != nil {
 				fmt.Printf("http request error:%v\n", err)
-				return
+				continue
 			}
 			if resp.Data.Error != "" && strings.Contains(resp.Data.Error, "operation not permitted") {
 				fmt.Println("syscall error, please check")
@@ -176,7 +176,7 @@ func httpRequest(client *SandboxClient, reqBody *RequestBody) (*Response, error)
 	return &resp, nil
 }
 
-func readCodeFromFile(filename string) (string, error) {
+func ReadCodeFromFile(filename string) (string, error) {
 	content, err := os.ReadFile(filename)
 	if err != nil {
 		return "", err
